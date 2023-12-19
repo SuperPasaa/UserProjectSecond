@@ -129,7 +129,7 @@ class _LoginPageState extends State<LoginPage> {
                       ShowSnackBar(context,"Please check that email entered is true , then try again");
                     }
                   },
-                  child: const Text(
+                  child:  Text(
                     'Forget Password ?',
                     textAlign: TextAlign.end,
                     style: TextStyle(fontWeight: FontWeight.bold),
