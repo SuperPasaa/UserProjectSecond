@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:second_project/Pages/Home.dart';
 import 'package:second_project/Pages/Login_Page.dart';
+import 'package:second_project/Pages/Sign_Up_Page.dart';
 import 'package:second_project/Pages/Welcome.dart';
 import 'package:second_project/firebase_options.dart';
 
@@ -39,7 +40,12 @@ class _TestState extends State<Test> {
   Widget build(BuildContext context) {
     return  MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: FirebaseAuth.instance.currentUser == null ? WelcomePage() : HomePage(),
+      home: FirebaseAuth.instance.currentUser != null && FirebaseAuth.instance.currentUser!.emailVerified ? HomePage() : WelcomePage(),
+      routes: {
+        "HomePage" :(context) => HomePage(),
+        "LoginPage" :(context) => LoginPage(),
+        "SignUpPage" :(context) => SignUpPage(),
+      },
     );
   }
 }

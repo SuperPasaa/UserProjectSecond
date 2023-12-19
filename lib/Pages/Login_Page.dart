@@ -5,6 +5,7 @@ import 'package:second_project/Pages/Home.dart';
 import 'package:second_project/Pages/Sign_Up_Page.dart';
 import 'package:second_project/widgets/CustomMaterialButton.dart';
 import 'package:second_project/widgets/CustomTextField.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -14,11 +15,33 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
-TextEditingController email = TextEditingController();
-TextEditingController password = TextEditingController();
-bool isPasswordHidden = true;
-
 class _LoginPageState extends State<LoginPage> {
+  TextEditingController email = TextEditingController();
+  TextEditingController password = TextEditingController();
+  bool isPasswordHidden = true;
+
+  Future signInWithGoogle() async {
+    // Trigger the authentication flow
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    if (googleUser == null) {
+      return;
+    }
+
+    // Obtain the auth details from the request
+    final GoogleSignInAuthentication? googleAuth =
+        await googleUser?.authentication;
+
+    // Create a new credential
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+
+    // Once signed in, return the UserCredential
+    await FirebaseAuth.instance.signInWithCredential(credential);
+    Navigator.of(context).pushNamedAndRemoveUntil("HomePage", (route) => false);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,10 +118,22 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(
                   height: 10,
                 ),
-                const Text(
-                  'Forget Password ?',
-                  textAlign: TextAlign.end,
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                GestureDetector(
+                  onTap: () async {
+                    try {
+                      FirebaseAuth.instance
+                          .sendPasswordResetEmail(email: email.text);
+                      ShowSnackBar(
+                          context, 'Password reset is sent to your password');
+                    } on FirebaseAuthException catch (e) {
+                      ShowSnackBar(context,"Please check that email entered is true , then try again");
+                    }
+                  },
+                  child: const Text(
+                    'Forget Password ?',
+                    textAlign: TextAlign.end,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
                 const SizedBox(
                   height: 10,
@@ -106,7 +141,7 @@ class _LoginPageState extends State<LoginPage> {
                 Padding(
                   padding: const EdgeInsets.only(left: 50, right: 50),
                   child: CustomButton(
-                    text: 'Sign Up',
+                    text: 'Sign In',
                     onPressed: () async {
                       try {
                         final credential = await FirebaseAuth.instance
@@ -114,7 +149,13 @@ class _LoginPageState extends State<LoginPage> {
                           email: email.text,
                           password: password.text,
                         );
-                        LoginNav(context);
+                        FirebaseAuth.instance.currentUser!
+                            .sendEmailVerification();
+                        if (credential.user!.emailVerified) {
+                          LoginNav(context);
+                        } else {
+                          ShowSnackBar(context, 'Please verify your email');
+                        }
                       } on FirebaseAuthException catch (e) {
                         if (e.code == 'user-not-found' ||
                             e.code == 'wrong-password') {
@@ -145,7 +186,9 @@ class _LoginPageState extends State<LoginPage> {
                   padding: const EdgeInsets.only(left: 50, right: 50),
                   child: MaterialButton(
                     color: Colors.blue,
-                    onPressed: () {},
+                    onPressed: () {
+                      signInWithGoogle();
+                    },
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -211,8 +254,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void LoginNav(BuildContext context) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return HomePage();
-    }));
+    Navigator.of(context).pushNamedAndRemoveUntil("HomePage", (route) => false);
   }
 }

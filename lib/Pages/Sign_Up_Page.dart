@@ -143,9 +143,12 @@ class _SignUpPageState extends State<SignUpPage> {
                   text: 'Sign Up',
                   onPressed: () async {
                     try {
-                      await UserSignUp();
-                      ShowSnackBar(context, "Email succesully created");
-                      SignUpNavigation(context);
+                      final credential = await FirebaseAuth.instance
+                          .createUserWithEmailAndPassword(
+                        email: email.text,
+                        password: password.text,
+                      );
+                      navMehod(context);
                     } on FirebaseAuthException catch (e) {
                       if (e.code == 'weak-password') {
                         ShowSnackBar(
@@ -199,17 +202,9 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  void SignUpNavigation(BuildContext context) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
+  void navMehod(BuildContext context) {
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
       return LoginPage();
     }));
-  }
-
-  Future<void> UserSignUp() async {
-    final credential =
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: email.text,
-      password: password.text,
-    );
   }
 }
