@@ -126,6 +126,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.3"
+  flutter_pw_validator:
+    dependency: "direct main"
+    description:
+      name: flutter_pw_validator
+      sha256: "01960d4d701f6b972f3a2f324e202d840ecfe1b84e00522f92dece874b1c9b30"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.6.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -240,6 +248,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.10.0"
+  modal_progress_hud_nsn:
+    dependency: "direct main"
+    description:
+      name: modal_progress_hud_nsn
+      sha256: "0b0d95e5ce3e1884390624fbe79fcf90d7de10abe05d26c0e276c25e7130e3e0"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.0"
   path:
     dependency: transitive
     description:
